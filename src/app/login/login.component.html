@@ -1,0 +1,48 @@
+<section class="vh-100">
+<div class="container-fluid h-custom">
+    <div class="row d-flex justify-content-center align-items-center h-100">
+        <div class="col-md-4">
+            <img src="../../assets/img/employee-icon.png" class="img-login">
+        </div>
+            <div class="col-md-6">
+                
+            <form [formGroup]="loginForm">
+                <div class="d-grid align-items-center justify-content-center">
+                    <p class="lead fw-normal mb-0 me-3">
+                        Log In Employee<br>
+                        <strong> Username : Nanda | Password : testAngular</strong>
+                    </p>
+                    <div>
+                        <label for="validationUsername" class="form-label">Username</label>
+                        <input formControlName="username" type="text" class="form-control form-control-lg" placeholder="Your Username">
+                        <div *ngIf="f['username'].touched && f['username'].invalid" class="alert alert-danger">
+                            <div *ngIf="f['username'].errors && f['username'].errors['required']"> Username is required!</div>
+                        </div>
+                    </div>
+                    <div>
+                        <label for="validationPassword" class="form-label">Password</label>
+                        <input formControlName="password" type="password" required class="form-control form-control-lg" placeholder="Your Password">
+                        <div *ngIf="f['password'].touched && f['password'].invalid" class="alert alert-danger">
+                            <div *ngIf="f['password'].errors && f['password'].errors['required']"> Username is required!</div>
+                        </div>
+                    </div>
+                    <div class="text-center text-lg-start mt-4 pt-2">
+                        <button mat-raised-button class="btn btn-primary btn-lg" (click)="login()">Login</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+</section>
+<style>
+    .h-custom{
+        height: calc(100% - 73px);
+    }
+    @media(max-width:450px){
+        .h-custom{
+            height: 100%;
+        }
+    }
+</style>
+<router-outlet></router-outlet>

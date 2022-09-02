@@ -1,0 +1,33 @@
+// #emplist{
+//     font-family: Arial, Helvetica, sans-serif;
+//     border-collapse: collapse;
+//     width: 100%;
+// }
+// #emplist td, #emplist th{
+//     padding:8px;
+// }
+// #emplist tr td:last-child{
+//     width:1%;
+//     white-space: nowrap;
+// }
+
+#toolbar-emp{
+    flex: 1 1 auto;
+}
+
+table {
+    width: 100%;
+}
+
+.mat-form-field {
+    font-size: 14px;
+    width: 100%;
+}
+
+td, th {
+    width: 5%;
+}
+
+.btn-add-side {
+    padding: 0 14px;
+}

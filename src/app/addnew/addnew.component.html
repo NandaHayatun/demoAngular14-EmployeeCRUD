@@ -1,0 +1,114 @@
+<mat-toolbar color="primary" class="toolbar-emp">
+    <button mat-icon-button class="example-icon" aria-label="Example icon-button with menu icon">
+    <mat-icon>people</mat-icon>
+    </button>
+    <span>Employee Database</span>
+</mat-toolbar>
+<div style="width: 500px; margin: auto; margin-top:20px;">
+    <div class="title-group">
+        <h1 class="mat-h1">Add New Employee</h1>
+        <mat-divider fxFlex="1 0"></mat-divider>
+    </div>
+    <form [formGroup]="addEmpForm">
+        <mat-card>
+            <mat-form-field appearance="outline">
+                <mat-label>Username</mat-label>
+                <input matInput formControlName="username" placeholder="Username" autocomplete="false">    
+            </mat-form-field>
+            <div *ngIf="f['username'].touched && f['username'].invalid" class="alert alert-danger">
+                <div *ngIf="f['username'].errors && f['username'].errors['required']">Username is required!</div>
+            </div>
+            <br>
+            <mat-form-field appearance="outline">
+                <mat-label>First Name</mat-label>
+                <input matInput formControlName="firstName" placeholder="Your First Name">
+            </mat-form-field>
+            <div *ngIf="f['firstName'].touched && f['firstName'].invalid" class="alert alert-danger">
+                <div *ngIf="f['firstName'].errors && f['firstName'].errors['required']"> First Name is required!</div>
+            </div>
+            <mat-form-field appearance="outline">
+                <mat-label>Last Name</mat-label>
+                <input matInput formControlName="lastName" placeholder="Your Last Name">
+            </mat-form-field>
+            <div *ngIf="f['lastName'].touched && f['lastName'].invalid" class="alert alert-danger">
+                <div *ngIf="f['lastName'].errors && f['lastName'].errors['required']"> Last Name is required!</div>
+            </div>
+            <br>
+            <mat-form-field appearance="outline">
+                <mat-label>Email</mat-label>
+                <input matInput formControlName="email" placeholder="Your Email" type="email">
+            </mat-form-field>
+            <div *ngIf="f['email'].touched && f['email'].invalid" class="alert alert-danger">
+                <div *ngIf="f['email'].errors && f['email'].errors['required']"> Email is required!</div>
+            </div>
+            <br>
+            <mat-form-field appearance="outline">
+                <mat-label>Birth Date</mat-label>
+                <input matInput [matDatepicker]="picker" formControlName="birthDate" max="currentDate | date:'yyyy-MM-dd'">
+                <mat-hint>MM/DD/YYYY</mat-hint>
+                <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                <mat-datepicker #picker></mat-datepicker>
+            </mat-form-field>
+            <div *ngIf="f['birthDate'].touched && f['birthDate'].invalid" class="alert alert-danger">
+                <div *ngIf="f['birthDate'].errors && f['birthDate'].errors['required']"> Birth Date is required!</div>
+            </div>
+            <br>
+            <mat-form-field appearance="outline">
+                <mat-label>Basic Salary</mat-label>
+                <input matInput type="number" formControlName="basicSalary" placeholder="Basic Salary Nominal">
+            </mat-form-field>
+            <div *ngIf="f['basicSalary'].touched && f['basicSalary'].invalid" class="alert alert-danger">
+                <div *ngIf="f['basicSalary'].errors && f['basicSalary'].errors['required']"> Basic Salary is required!</div>
+            </div>
+            <br>
+            <mat-form-field appearance="outline">
+                <mat-label>Status</mat-label>
+                <mat-select [(value)]="selected" formControlName="status">
+                    <mat-option>None</mat-option>
+                    <mat-option value="Permanent">Permanent Employee</mat-option>
+                    <mat-option value="Contract">Contract Employee</mat-option>
+                </mat-select>
+            </mat-form-field>
+            <div *ngIf="f['status'].touched && f['status'].invalid" class="alert alert-danger">
+                <div *ngIf="f['status'].errors && f['status'].errors['required']"> Status is required!</div>
+            </div>
+            <mat-form-field appearance="outline">
+                <mat-label>Group</mat-label>
+                <input type="text"
+                        placeholder="Pick one"
+                        aria-label="Group Name"
+                        matInput
+                        [matAutocomplete]="auto"
+                        [formControl]="group">
+                <mat-autocomplete #auto="matAutocomplete">
+                <mat-option *ngFor="let option of filteredOptions | async" [value]="option">
+                    {{option}}
+                </mat-option>
+                </mat-autocomplete>
+            </mat-form-field>
+            <div *ngIf="f['group'].touched && f['group'].invalid" class="alert alert-danger">
+                <div *ngIf="f['group'].errors && f['group'].errors['required']"> Group is required!</div>
+            </div>
+            <br>
+            <mat-form-field appearance="outline">
+                <mat-label>Description</mat-label>
+                <input matInput [matDatepicker]="desDate" formControlName="description">
+                <mat-hint>MM/DD/YYYY</mat-hint>
+                <mat-datepicker-toggle matSuffix [for]="desDate"></mat-datepicker-toggle>
+                <mat-datepicker #desDate></mat-datepicker>
+            </mat-form-field>
+            <div *ngIf="f['description'].touched && f['description'].invalid" class="alert alert-danger">
+                <div *ngIf="f['description'].errors && f['description'].errors['required']"> Description is required!</div>
+            </div>
+        </mat-card>
+        <mat-card>
+            <div class="full-wrapper button-wrapper">
+              <div class="button-wrapper" [align]="'end'">
+                <button mat-raised-button class="btn btn-danger" style="margin-right:5px" routerLink="/EmployeeList">Cancel</button>
+                <button mat-raised-button class="btn btn-primary" (click)="processAdd()">Submit</button>
+              </div>
+            </div>
+        </mat-card>
+    </form>
+</div>
+<router-outlet></router-outlet>
