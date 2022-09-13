@@ -1,25 +1,13 @@
-import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
+import { Component, OnInit, ViewChild, AfterViewInit, Optional, Inject } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, FormGroupName, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { first, map, Observable, ReplaySubject, Subject } from 'rxjs';
+import { first, ReplaySubject, Subject } from 'rxjs';
 import { take, takeUntil } from 'rxjs/operators';
 import { EmployeeServices } from '../APIServices/employee.services';
 import Swal from 'sweetalert2';
 import { GROUPS,Group } from '../APIServices/grouplist';
 import { MatSelect } from '@angular/material/select';
-
-interface GroupName{
-  id: string,
-  username: string,
-  firstName: string,
-  lastName: string,
-  email: string,
-  birthDate: string,
-  basicSalary: number,
-  status: string,
-  group: string,
-  description: string
-}
+import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/material/core';
 
 @Component({
   selector: 'app-edit-data',
@@ -33,18 +21,9 @@ export class EditDataComponent implements OnInit {
   id:string;
   submitted = false;
   isEditEmp:boolean;
+  basicSalary= '0';
   selected: any;
   filtered: any;
-  selectedGroup: string;
-  // options: any[] = [{value:'FrontEnd'},{value:'Backend'},{value:'IT Infrastructure'},{value:'DB Admin'},{value:'System Implementor'},
-  // {value:'QA Engineer'},{value:'Project Manager'},{value:'Flutter Developer'},{value:'Graphic Designer'},{value:'IT Auditor'}];
-  
-  // protected groupNames: GroupName[] = [{value:'FrontEnd'},{value:'Backend'},{value:'IT Infrastructure'},{value:'DB Admin'},{value:'System Implementor'},
-  // {value:'QA Engineer'},{value:'Project Manager'},{value:'Flutter Developer'},{value:'Graphic Designer'},{value:'IT Auditor'}];
-  
-  // onChange(){
-  //   this.filtered = this.options.filter(t=> t.value == this.selected);
-  // }
   
   protected groups: Group[] = GROUPS;
   group: FormControl = new FormControl();
@@ -53,29 +32,27 @@ export class EditDataComponent implements OnInit {
   @ViewChild('grouplist') grouplist: MatSelect;
   protected _onDestroy = new Subject<void>();
 
-  // options={
-  //   "groupName" : ['FrontEnd','Backend','IT Infrastructure','DB Admin','System Implementor','QA Engineer','Project Manager','Flutter Developer','Graphic Designer','IT Auditor']
-  // }
-  // public options: ['FrontEnd','Backend','IT Infrastructure','DB Admin','System Implementor','QA Engineer','Project Manager','Flutter Developer','Graphic Designer','IT Auditor'];
-  // public selectedGroup = this.options[1];
   constructor(private formBuilder: FormBuilder, private route: ActivatedRoute, 
-    private router: Router, private employeeService: EmployeeServices) { }
+    private router: Router, private employeeService: EmployeeServices, private dateAdapter: DateAdapter<Date>, @Optional() @Inject(MAT_DATE_LOCALE) dateLocale: string) {
+      this.dateAdapter.setLocale('id');
+     }
 
   ngOnInit(): void {
+    this.futureDateDisable();
     this.id = this.route.snapshot.params['id'];
     this.getEmpById(this.route.snapshot.paramMap.get('id'));
     this.editEmpForm = this.formBuilder.group({
-      username: ['', Validators.required, Validators.minLength(5), Validators.maxLength(15)],
-      firstName: ['', Validators.required],
-      lastName: ['',Validators.required],
-      email: ['', Validators.required, Validators.email],
-      birthDate: ['', Validators.required],
-      basicSalary: ['', Validators.required],
-      status: ['', Validators.required],
-      group: ['', Validators.required],
-      description: ['', Validators.required]
+      username: ['', [Validators.required, Validators.minLength(5), Validators.maxLength(15)]],
+      firstName: ['', [Validators.required]],
+      lastName: ['',[Validators.required]],
+      email: ['', [Validators.required, Validators.email, Validators.pattern('^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$')]],
+      birthDate: ['', [Validators.required]],
+      basicSalary: ['', [Validators.required, Validators.min(1000000)]],
+      status: ['', [Validators.required]],
+      group: ['', [Validators.required]],
+      description: ['', [Validators.required]]
     });
-
+    
     if(this.isEditEmp){
       this.employeeService.getItem(this.id).pipe(first()).subscribe(x => this.editEmpForm.patchValue(x));
     }
@@ -85,6 +62,28 @@ export class EditDataComponent implements OnInit {
     this.groupFilterControl.valueChanges.pipe(takeUntil(this._onDestroy)).subscribe(()=>{
       this.filterGroup();
     })
+
+  }
+
+  maxDate:any;
+  futureDateDisable(){
+    var date:any = new Date();
+    var todayDate:any = date.getDate();
+    var month:any = date.getMonth() + 1;
+    var year:any = date.getFullYear();
+    if(todayDate<10){
+      todayDate = '0' + todayDate;
+    }
+
+    if(month<10){
+      month = '0' + month;
+    }
+
+    this.maxDate = year + "-" + month + "-" + todayDate;
+  }
+
+  onGroupSelection(){
+    console.log(this.currentEmployee.group);
   }
 
   ngAfterViewInit() {
@@ -114,7 +113,7 @@ export class EditDataComponent implements OnInit {
     } else {
       search = search.toLowerCase();
     }
-    // filter the banks
+    // filter the group
     this.options.next(
       this.groups.filter(group => group.name.toLowerCase().indexOf(search) > -1)
     );

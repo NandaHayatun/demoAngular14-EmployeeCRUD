@@ -1,13 +1,12 @@
-import { Component, OnInit, ViewChild, AfterViewInit, ElementRef } from '@angular/core';
+import { Component, OnInit, ViewChild, AfterViewInit, ElementRef, ViewEncapsulation, EventEmitter, Input, Output } from '@angular/core';
 import { response } from 'express';
 import { EmployeeServices } from '../APIServices/employee.services';
 import { AbstractControl, FormBuilder, FormControl, FormGroup, FormsModule, ValidationErrors, Validators } from '@angular/forms';
-import { ReplaySubject, Subject } from 'rxjs';
-import { MatSelect } from '@angular/material/select';
-import * as moment from 'moment';
-import { Observable } from 'rxjs';
-import { map,startWith} from 'rxjs/operators';
+import { ReplaySubject, Subject, Subscription } from 'rxjs';
+import { MatSelect, MatSelectChange } from '@angular/material/select';
 import { ActivatedRoute, Router } from '@angular/router';
+import { GROUPS,Group } from '../APIServices/grouplist';
+import { take, takeUntil } from 'rxjs/operators';
 import Swal from 'sweetalert2';
 
 export class Ngroup{
@@ -19,56 +18,111 @@ export class Ngroup{
   styleUrls: ['./addnew.component.scss']
 })
 export class AddnewComponent implements OnInit {
-  group = new FormControl(undefined, [Validators.required, this.requireMatch.bind(this)]);
-  options: string[] = ['FrontEnd','Backend','IT Infrastructure','DB Admin','System Implementor','QA Engineer','Project Manager','Flutter Developer','Graphic Designer','IT Auditor'];
-  filteredOptions:Observable<string[]>;
-  currentDate: any = new Date();
   addEmpForm: FormGroup;
-  selected!:string;
+  // groupsel!: string;
+  basicSalary= '0';
+  selected: any;
+  filtered: any;
 
+  protected groups: Group[] = GROUPS;
+  group: FormControl = new FormControl();
+  public groupFilterControl: FormControl = new FormControl();
+  public options: ReplaySubject<Group[]> = new ReplaySubject<Group[]>(1);
+  @ViewChild('grouplist',{static: true}) grouplist: MatSelect;
+  protected _onDestroy = new Subject<void>();
+
+  get email(){
+    return this.addEmpForm.get("email");
+  }
+  
+  @Output() onSelectionChange: EventEmitter<any> = new EventEmitter<any>();
   constructor(private employeeService: EmployeeServices, private formBuilder: FormBuilder, 
     private route: ActivatedRoute, private router: Router) { 
   }
 
   ngOnInit():void {
-    this.filteredOptions = this.group.valueChanges.pipe(
-      startWith(''),
-      map(value => this._filter(value || ''))
-    );
+    this.futureDateDisable();
 
     this.addEmpForm = this.formBuilder.group({
-      username: ['', Validators.required, Validators.minLength(5), Validators.maxLength(15)],
-      firstName: ['', Validators.required],
-      lastName: ['',Validators.required],
-      email: ['', Validators.required, Validators.email],
-      birthDate: ['', Validators.required],
-      basicSalary: ['', Validators.required],
-      status: ['', Validators.required],
-      group: ['', Validators.required],
-      description: ['', Validators.required]
+      username: ['', [Validators.required, Validators.minLength(5), Validators.maxLength(15)]],
+      firstName: ['', [Validators.required]],
+      lastName: ['',[Validators.required]],
+      email: ['', [Validators.required, Validators.email, Validators.pattern('^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$')]],
+      birthDate: ['', [Validators.required]],
+      basicSalary: ['', [Validators.required, Validators.min(1000000)]],
+      status: ['', [Validators.required]],
+      group: ['', [Validators.required]],
+      description: ['', [Validators.required]]
+    });
+
+    this.group.setValue(this.groups[10]);
+    this.options.next(this.groups.slice());
+    this.groupFilterControl.valueChanges.pipe(takeUntil(this._onDestroy)).subscribe(()=>{
+      this.filterGroup();
     })
+
   }
 
-  get f(){
-    return this.addEmpForm.controls;
-  }
-
-  private requireMatch(control: FormControl): ValidationErrors | null{
-    const selection: any = control.value;
-    if(this.options && this.options.indexOf(selection)<0){
-      return {requireMatch:true};
+  maxDate:any;
+  futureDateDisable(){
+    var date:any = new Date();
+    var todayDate:any = date.getDate();
+    var month:any = date.getMonth() + 1;
+    var year:any = date.getFullYear();
+    if(todayDate<10){
+      todayDate = '0' + todayDate;
     }
-    return null;
-  }
-  private _filter(value: string): string[] {
-    const filterValue = value.toLowerCase();
-    return this.options.filter(option => option.toLowerCase().includes(filterValue));
 
+    if(month<10){
+      month = '0' + month;
+    }
+
+    this.maxDate = year + "-" + month + "-" + todayDate;
   }
+
+  ngAfterViewInit(): void {
+    this.setInitialValue();
+  }
+
+  ngOnDestroy(): void {
+    this._onDestroy.next();
+    this._onDestroy.complete();
+  }
+
+  onChange($event:any) {
+    this.onSelectionChange.emit($event);
+  }
+
+  private setInitialValue() {
+    this.options
+      .pipe(take(1), takeUntil(this._onDestroy))
+      .subscribe(() => {
+        if(this.grouplist)
+          this.grouplist.compareWith = (a: Group, b: Group) => a.id === b.id;
+      });
+  }
+
+  private filterGroup() {
+    if (!this.groups) {
+      return;
+    }
+    let search = this.groupFilterControl.value;
+    if (!search) {
+      this.options.next(this.groups.slice());
+      return;
+    } else {
+      search = search.toLowerCase();
+    }
+    this.options.next(
+      this.groups.filter(option => option.name.toLowerCase().indexOf(search) > -1)
+    );
+  }
+  // onGroupSelection(){
+  //   console.log(this.groupsel);
+  // }
 
   processAdd(){
-    // console.log(this.addEmpForm.value);
-    // console.log(this.groupname.value);
+    console.log(this.addEmpForm.controls['group'].value);
     Swal.fire({
       title: 'Are you sure?',
       text: "Please Check your Data before saving",
@@ -80,12 +134,12 @@ export class AddnewComponent implements OnInit {
     }).then((result) => {
       if (result.isConfirmed) {
         Swal.fire(
+          'Congratulation',
           'New Employee Data has been added!',
           'success'
         )
         this.employeeService.create(this.addEmpForm.value).subscribe({
           next: (res) => {
-            alert("Employee Added Successfully!")
             this.router.navigate(['/EmployeeList'], { relativeTo: this.route});
           }, error:()=>{
             alert("Error while adding new Employee")

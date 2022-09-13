@@ -10,39 +10,61 @@
         <h2 *ngIf="isEditEmp"></h2>
         <mat-divider fxFlex="1 0"></mat-divider>
     </div>
-    <form [formGroup]="editEmpForm">
+    <form [formGroup]="editEmpForm" #editForm="ngForm">
         <mat-card>
             <mat-form-field appearance="outline">
                 <mat-label>Username</mat-label>
-                <input matInput formControlName="username" placeholder="Username" [(ngModel)]="currentEmployee.username">
+                <input matInput formControlName="username" placeholder="Username" [(ngModel)]="currentEmployee.username" minlength="5" maxlength="15">
             </mat-form-field>
+            <div *ngIf="editEmpForm.get('username')?.touched">
+                <div *ngIf="editEmpForm.get('username')?.hasError('required')" class="alert alert-danger">Username is required!</div>
+                <div *ngIf="editEmpForm.get('username')?.hasError('minlength')" class="alert alert-danger">Username at least need 5 character</div>
+            </div>
             <br>
             <mat-form-field appearance="outline">
                 <mat-label>First Name</mat-label>
                 <input matInput formControlName="firstName" placeholder="Your First Name" [(ngModel)]="currentEmployee.firstName">
             </mat-form-field>
+            <div *ngIf="editEmpForm.get('firstName')?.touched">
+                <div *ngIf="editEmpForm.get('firstName')?.hasError('required')" class="alert alert-danger"> First Name is required!</div>
+            </div>
             <mat-form-field appearance="outline">
                 <mat-label>Last Name</mat-label>
                 <input matInput formControlName="lastName" placeholder="Your Last Name" [(ngModel)]="currentEmployee.lastName">
             </mat-form-field>
+            <div *ngIf="editEmpForm.get('lastName')?.touched">
+                <div *ngIf="editEmpForm.get('lastName')?.hasError('required')" class="alert alert-danger"> Last Name is required!</div>
+            </div>
             <br>
             <mat-form-field appearance="outline">
                 <mat-label>Email</mat-label>
                 <input matInput formControlName="email" placeholder="Your Email" [(ngModel)]="currentEmployee.email">
             </mat-form-field>
+            <div *ngIf="editEmpForm.get('email')?.touched">
+                <div *ngIf="editEmpForm.get('email')?.hasError('required')"  class='alert alert-danger'>
+                    Email is required!
+                </div>
+                <div *ngIf="editEmpForm.get('email')?.hasError('email')"  class='alert alert-danger'>
+                    Please Enter a valid email!
+                </div>
+            </div>
             <br>
-            <mat-form-field appearance="outline">
-                <mat-label>Birth Date</mat-label>
-                <input matInput [matDatepicker]="bDate" formControlName="birthDate" [(ngModel)]="currentEmployee.birthDate">
-                <mat-hint>MM/DD/YYYY</mat-hint>
-                <mat-datepicker-toggle matSuffix [for]="bDate"></mat-datepicker-toggle>
-                <mat-datepicker #bDate></mat-datepicker>
-            </mat-form-field>
+            <div class="form-floating mb-3">
+                <input type="date" class="form-control" id="floatingInput" formControlName="birthDate" [(ngModel)]="currentEmployee.birthDate" max="{{ maxDate }}">
+                <label for="floatingInput">Birth Date*</label>
+            </div>
+            <div *ngIf="editEmpForm.get('birthDate')?.touched">
+                <div *ngIf="editEmpForm.get('birthDate')?.hasError('required')" class='alert alert-danger'> Birth Date is required!</div>
+            </div>
             <br>
             <mat-form-field appearance="outline">
                 <mat-label>Basic Salary</mat-label>
-                <input matInput type="number" formControlName="basicSalary" placeholder="Basic Salary Nominal" [(ngModel)]="currentEmployee.basicSalary">
+                <input matInput currencyMask formControlName="basicSalary" [(ngModel)]="currentEmployee.basicSalary" [options]="{ prefix: 'Rp ', thousands: '.', decimal: ',' }">
             </mat-form-field>
+            <div *ngIf="editEmpForm.get('basicSalary')?.touched">
+                <div *ngIf="editEmpForm.get('basicSalary')?.hasError('required')" class='alert alert-danger'> Basic Salary is required!</div>
+                <div *ngIf="editEmpForm.get('basicSalary')?.hasError('min')" class='alert alert-danger'> Basic Salary minimum Rp 1.000.000</div>
+            </div>
             <br>
             <mat-form-field appearance="outline">
                 <mat-label>Status</mat-label>
@@ -52,34 +74,37 @@
                     <mat-option value="Contract">Contract Employee</mat-option>
                 </mat-select>
             </mat-form-field>
+            <div *ngIf="editEmpForm.get('status')?.touched">
+                <div *ngIf="editEmpForm.get('status')?.hasError('required')" class='alert alert-danger'> Status is required!</div>
+            </div>
             <mat-form-field appearance="outline">
                 <mat-label>Group</mat-label>
-                <!-- Start Autocomplete -->
-                <mat-select [formControl]="group" #grouplist>
+                <mat-select [formControl]="group" formControlName="group" ngDefaultControl #grouplist [(ngModel)]="currentEmployee.group" (ngModelChange)="onGroupSelection()" noEntriesFoundLabel="Not Found">
                     <mat-option>
-                        <ngx-mat-select-search [formControl]="groupFilterControl" ></ngx-mat-select-search>
+                        <ngx-mat-select-search [formControl]="groupFilterControl" placeholderLabel="Select a Group.."></ngx-mat-select-search>
                     </mat-option>
-                    <mat-option *ngFor="let option of options | async" [value]="option">
+                    <mat-option *ngFor="let option of options | async" [value]="option.name">
                         {{option.name}}
                     </mat-option>
                 </mat-select>
-                <!-- End Autocomplete -->
             </mat-form-field>
-            
+            <div *ngIf="editEmpForm.get('group')?.touched">
+                <div *ngIf="editEmpForm.get('group')?.hasError('required')" class='alert alert-danger'> Group is required!</div>
+            </div> 
             <br>
-            <mat-form-field appearance="outline">
-                <mat-label>Description</mat-label>
-                <input matInput [matDatepicker]="desDate" formControlName="description" [(ngModel)]="currentEmployee.description">
-                <mat-hint>MM/DD/YYYY</mat-hint>
-                <mat-datepicker-toggle matSuffix [for]="desDate"></mat-datepicker-toggle>
-                <mat-datepicker #desDate></mat-datepicker>
-            </mat-form-field>
+            <div class="form-floating mb-3">
+                <input type="date" class="form-control" id="floatingInput" formControlName="description" [(ngModel)]="currentEmployee.description" max="{{ maxDate }}">
+                <label for="floatingInput">Description*</label>
+            </div>
+            <div *ngIf="editEmpForm.get('description')?.touched">
+                <div *ngIf="editEmpForm.get('description')?.hasError('required')" class='alert alert-danger'> Description is required!</div>
+            </div>
         </mat-card>
         <mat-card>
             <div class="full-wrapper button-wrapper">
               <div class="button-wrapper" [align]="'end'">
                 <button mat-raised-button class="btn btn-danger" style="margin-right:5px" routerLink="/EmployeeList">Cancel</button>
-                <button mat-raised-button class="btn btn-primary" (click)="processEdit()">Save Changes</button>
+                <button mat-raised-button class="btn btn-primary" (click)="processEdit()" [disabled]="editForm.form.invalid">Save Changes</button>
               </div>
             </div>
         </mat-card>

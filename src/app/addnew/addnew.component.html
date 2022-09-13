@@ -4,61 +4,65 @@
     </button>
     <span>Employee Database</span>
 </mat-toolbar>
-<div style="width: 500px; margin: auto; margin-top:20px;">
+<div style="width: 500px; margin: auto; margin-top:40px;" class="container">
     <div class="title-group">
         <h1 class="mat-h1">Add New Employee</h1>
         <mat-divider fxFlex="1 0"></mat-divider>
     </div>
-    <form [formGroup]="addEmpForm">
+    <form [formGroup]="addEmpForm" #addForm="ngForm">
         <mat-card>
             <mat-form-field appearance="outline">
                 <mat-label>Username</mat-label>
-                <input matInput formControlName="username" placeholder="Username" autocomplete="false">    
+                <input matInput formControlName="username" placeholder="Username" autocomplete="false" minlength="5" maxlength="15">    
             </mat-form-field>
-            <div *ngIf="f['username'].touched && f['username'].invalid" class="alert alert-danger">
-                <div *ngIf="f['username'].errors && f['username'].errors['required']">Username is required!</div>
+            <div *ngIf="addEmpForm.get('username')?.touched">
+                <div *ngIf="addEmpForm.get('username')?.hasError('required')" class="alert alert-danger">Username is required!</div>
+                <div *ngIf="addEmpForm.get('username')?.hasError('minlength')" class="alert alert-danger">Username at least need 5 character</div>
             </div>
             <br>
             <mat-form-field appearance="outline">
                 <mat-label>First Name</mat-label>
-                <input matInput formControlName="firstName" placeholder="Your First Name">
+                <input matInput formControlName="firstName" placeholder="Your First Name" class="fname">
             </mat-form-field>
-            <div *ngIf="f['firstName'].touched && f['firstName'].invalid" class="alert alert-danger">
-                <div *ngIf="f['firstName'].errors && f['firstName'].errors['required']"> First Name is required!</div>
+            <div *ngIf="addEmpForm.get('firstName')?.touched">
+                <div *ngIf="addEmpForm.get('firstName')?.hasError('required')" class="alert alert-danger"> First Name is required!</div>
             </div>
             <mat-form-field appearance="outline">
                 <mat-label>Last Name</mat-label>
-                <input matInput formControlName="lastName" placeholder="Your Last Name">
+                <input matInput formControlName="lastName" placeholder="Your Last Name" class="lname">
             </mat-form-field>
-            <div *ngIf="f['lastName'].touched && f['lastName'].invalid" class="alert alert-danger">
-                <div *ngIf="f['lastName'].errors && f['lastName'].errors['required']"> Last Name is required!</div>
+            <div *ngIf="addEmpForm.get('lastName')?.touched">
+                <div *ngIf="addEmpForm.get('lastName')?.hasError('required')" class="alert alert-danger"> Last Name is required!</div>
             </div>
             <br>
             <mat-form-field appearance="outline">
                 <mat-label>Email</mat-label>
                 <input matInput formControlName="email" placeholder="Your Email" type="email">
             </mat-form-field>
-            <div *ngIf="f['email'].touched && f['email'].invalid" class="alert alert-danger">
-                <div *ngIf="f['email'].errors && f['email'].errors['required']"> Email is required!</div>
+            <div *ngIf="addEmpForm.get('email')?.touched">
+                <div *ngIf="addEmpForm.get('email')?.hasError('required')"  class='alert alert-danger'>
+                    Email is required!
+                </div>
+                <div *ngIf="addEmpForm.get('email')?.hasError('email')"  class='alert alert-danger'>
+                    Please Enter a valid email!
+                </div>
             </div>
             <br>
-            <mat-form-field appearance="outline">
-                <mat-label>Birth Date</mat-label>
-                <input matInput [matDatepicker]="picker" formControlName="birthDate" max="currentDate | date:'yyyy-MM-dd'">
-                <mat-hint>MM/DD/YYYY</mat-hint>
-                <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-                <mat-datepicker #picker></mat-datepicker>
-            </mat-form-field>
-            <div *ngIf="f['birthDate'].touched && f['birthDate'].invalid" class="alert alert-danger">
-                <div *ngIf="f['birthDate'].errors && f['birthDate'].errors['required']"> Birth Date is required!</div>
+            <div class="form-floating mb-3">
+                <input type="date" class="form-control" id="floatingInput" formControlName="birthDate" max="{{ maxDate }}">
+                <label for="floatingInput">Birth Date*</label>
+            </div>
+            <div *ngIf="addEmpForm.get('birthDate')?.touched">
+                <div *ngIf="addEmpForm.get('birthDate')?.hasError('required')" class='alert alert-danger'> Birth Date is required!</div>
             </div>
             <br>
             <mat-form-field appearance="outline">
                 <mat-label>Basic Salary</mat-label>
-                <input matInput type="number" formControlName="basicSalary" placeholder="Basic Salary Nominal">
+                <input matInput currencyMask [(ngModel)]="basicSalary" formControlName="basicSalary" [options]="{ prefix: 'Rp ', thousands: '.', decimal: ',' }" />
             </mat-form-field>
-            <div *ngIf="f['basicSalary'].touched && f['basicSalary'].invalid" class="alert alert-danger">
-                <div *ngIf="f['basicSalary'].errors && f['basicSalary'].errors['required']"> Basic Salary is required!</div>
+            <div *ngIf="addEmpForm.get('basicSalary')?.touched">
+                <div *ngIf="addEmpForm.get('basicSalary')?.hasError('required')" class='alert alert-danger'> Basic Salary is required!</div>
+                <div *ngIf="addEmpForm.get('basicSalary')?.hasError('min')" class='alert alert-danger'> Basic Salary minimum Rp 1.000.000</div>
             </div>
             <br>
             <mat-form-field appearance="outline">
@@ -69,43 +73,37 @@
                     <mat-option value="Contract">Contract Employee</mat-option>
                 </mat-select>
             </mat-form-field>
-            <div *ngIf="f['status'].touched && f['status'].invalid" class="alert alert-danger">
-                <div *ngIf="f['status'].errors && f['status'].errors['required']"> Status is required!</div>
+            <div *ngIf="addEmpForm.get('status')?.touched">
+                <div *ngIf="addEmpForm.get('status')?.hasError('required')" class='alert alert-danger'> Status is required!</div>
             </div>
-            <mat-form-field appearance="outline">
+            <mat-form-field appearance="outline" *ngIf="groupFilterControl">
                 <mat-label>Group</mat-label>
-                <input type="text"
-                        placeholder="Pick one"
-                        aria-label="Group Name"
-                        matInput
-                        [matAutocomplete]="auto"
-                        [formControl]="group">
-                <mat-autocomplete #auto="matAutocomplete">
-                <mat-option *ngFor="let option of filteredOptions | async" [value]="option">
-                    {{option}}
-                </mat-option>
-                </mat-autocomplete>
+                <mat-select [formControl]="group" formControlName="group" ngDefaultControl #grouplist noEntriesFoundLabel="Not Found">
+                    <mat-option>
+                        <ngx-mat-select-search [formControl]="groupFilterControl" placeholderLabel="Select a Group.."></ngx-mat-select-search>
+                    </mat-option>
+                    <mat-option *ngFor="let option of options | async" [value]="option.name">
+                        {{option.name}}
+                    </mat-option>
+                </mat-select>
             </mat-form-field>
-            <div *ngIf="f['group'].touched && f['group'].invalid" class="alert alert-danger">
-                <div *ngIf="f['group'].errors && f['group'].errors['required']"> Group is required!</div>
-            </div>
+            <div *ngIf="addEmpForm.get('group')?.touched">
+                <div *ngIf="addEmpForm.get('group')?.hasError('required')" class='alert alert-danger'> Group is required!</div>
+            </div> 
             <br>
-            <mat-form-field appearance="outline">
-                <mat-label>Description</mat-label>
-                <input matInput [matDatepicker]="desDate" formControlName="description">
-                <mat-hint>MM/DD/YYYY</mat-hint>
-                <mat-datepicker-toggle matSuffix [for]="desDate"></mat-datepicker-toggle>
-                <mat-datepicker #desDate></mat-datepicker>
-            </mat-form-field>
-            <div *ngIf="f['description'].touched && f['description'].invalid" class="alert alert-danger">
-                <div *ngIf="f['description'].errors && f['description'].errors['required']"> Description is required!</div>
+            <div class="form-floating mb-3">
+                <input type="date" class="form-control" id="floatingInput" formControlName="description" max="{{ maxDate }}">
+                <label for="floatingInput">Description*</label>
+            </div>
+            <div *ngIf="addEmpForm.get('description')?.touched">
+                <div *ngIf="addEmpForm.get('description')?.hasError('required')" class='alert alert-danger'> Description is required!</div>
             </div>
         </mat-card>
         <mat-card>
             <div class="full-wrapper button-wrapper">
               <div class="button-wrapper" [align]="'end'">
                 <button mat-raised-button class="btn btn-danger" style="margin-right:5px" routerLink="/EmployeeList">Cancel</button>
-                <button mat-raised-button class="btn btn-primary" (click)="processAdd()">Submit</button>
+                <button mat-raised-button class="btn btn-primary" (click)="processAdd()" [disabled]="addForm.form.invalid">Submit</button>
               </div>
             </div>
         </mat-card>
