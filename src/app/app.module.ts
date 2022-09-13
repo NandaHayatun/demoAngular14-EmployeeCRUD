@@ -23,7 +23,8 @@ import { AddnewComponent } from './addnew/addnew.component';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatSelectModule } from '@angular/material/select';
 import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatNativeDateModule } from '@angular/material/core';
+import { MatMomentDateModule, MAT_MOMENT_DATE_ADAPTER_OPTIONS, MAT_MOMENT_DATE_FORMATS, MomentDateAdapter } from '@angular/material-moment-adapter'
+import { DateAdapter, MatNativeDateModule, MAT_DATE_FORMATS } from '@angular/material/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
@@ -31,6 +32,12 @@ import { EditDataComponent } from './edit-data/edit-data.component';
 import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
 import { DetailDataComponent } from './detail-data/detail-data.component';
 import { MatListModule } from '@angular/material/list';
+import { MatSidenavModule } from '@angular/material/sidenav';
+import { CurrencyMaskModule } from "ng2-currency-mask";
+import { MAT_DATE_LOCALE } from '@angular/material/core';
+import { DatePipe } from '@angular/common';
+import { FlexLayoutModule } from "@angular/flex-layout";
+import * as moment from 'moment';
 @NgModule({
   declarations: [
     AppComponent,
@@ -58,14 +65,26 @@ import { MatListModule } from '@angular/material/list';
     MatSortModule,
     MatSelectModule,
     MatDatepickerModule,
+    MatMomentDateModule,
     MatNativeDateModule,
     MatCardModule,
     MatDividerModule,
     MatAutocompleteModule,
     NgxMatSelectSearchModule,
-    MatListModule
+    MatListModule,
+    MatSidenavModule,
+    CurrencyMaskModule
   ],
-  providers: [],
+  providers: [DatePipe,
+    {
+      provide: MAT_DATE_LOCALE, useValue: 'id-ID'
+    },
+    { 
+    provide: DateAdapter, 
+    useClass: MomentDateAdapter, 
+    deps:[MAT_DATE_LOCALE, MAT_MOMENT_DATE_ADAPTER_OPTIONS], 
+    },
+    {provide: MAT_DATE_FORMATS, useValue: MAT_MOMENT_DATE_FORMATS}],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

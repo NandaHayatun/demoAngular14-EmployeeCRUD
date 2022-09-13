@@ -10,6 +10,8 @@ import { response } from 'express';
 import { Router } from '@angular/router';
 import Swal from 'sweetalert2';
 import { registerLocaleData } from '@angular/common';
+import { FormControl } from '@angular/forms';
+
 
 @Component({
   selector: 'app-employee-list-page',
@@ -18,17 +20,47 @@ import { registerLocaleData } from '@angular/common';
 })
 
 export class EmployeeListPageComponent implements OnInit {
-
+  private timeZone = 'Indonesia/Jakarta';
   displayedColumns: string[] = ['username','firstName','lastName','email','birthDate','basicSalary','status','group','description','LookDetail','EditThis','DeleteThis'];
   dataSource!: MatTableDataSource<any>;
+
+  firstNameSearch = new FormControl();
+  lastNameSearch = new FormControl();
+  groupSearch = new FormControl();
+
+  filteredValues = {
+    firstName: '', lastName: '', group: ''
+  };
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
-  constructor(private empServices: EmployeeServices, private router: Router) {}
+  constructor(private empServices: EmployeeServices, private router: Router) {
+  }
 
   ngOnInit(): void {
     this.getAllEmployee();
+
+    this.firstNameSearch.valueChanges.subscribe((firstNameSearchValue)=>{
+      this.filteredValues['firstName'] = firstNameSearchValue;
+      this.dataSource.filter = this.filteredValues['firstName'].trim().toLowerCase();
+
+      if(this.dataSource.paginator){
+        this.paginator.firstPage();
+      }
+    });
+
+    this.lastNameSearch.valueChanges.subscribe((lastNameSearchValue)=>{
+      this.filteredValues['lastName'] = lastNameSearchValue;
+      this.dataSource.filter = this.filteredValues['lastName'].trim().toLowerCase();
+
+      if(this.dataSource.paginator){
+        this.paginator.firstPage();
+      }
+    });
+
+   
+    
   }
 
   getAllEmployee(){
@@ -42,15 +74,6 @@ export class EmployeeListPageComponent implements OnInit {
         alert("Error while fetching data Employee")
       }
     })
-  }
-
-  applyFilter(event: Event) {
-    const filterValue = (event.target as HTMLInputElement).value;
-    this.dataSource.filter = filterValue.trim().toLowerCase();
-
-    if (this.dataSource.paginator) {
-      this.dataSource.paginator.firstPage();
-    }
   }
 
   GotoEditData(row:any){

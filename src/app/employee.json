@@ -12,16 +12,15 @@
       "firstName": "Williams",
       "lastName": "Spence",
       "email": "williamsspence@netility.com",
-      "birthDate": "2004-07-03T17:00:00.000Z",
+      "birthDate": "2019-01-01",
       "basicSalary": 3975284.2,
       "status": "Contract",
-      "group": "",
-      "description": "2021-03-05",
+      "group": "Backend",
+      "description": "2022-09-06",
       "id": 1
     },
     {
-      "id": 2,
-      "username": "Diaz",
+      "username": "Diazz",
       "firstName": "Anna",
       "lastName": "Dudley",
       "email": "annadudley@netility.com",
@@ -29,7 +28,8 @@
       "basicSalary": 3429051.87,
       "status": "Permanent",
       "group": "Backend",
-      "description": "2022-01-27"
+      "description": "2022-01-27",
+      "id": 2
     },
     {
       "id": 3,
@@ -80,8 +80,7 @@
       "description": "2021-02-24"
     },
     {
-      "id": 7,
-      "username": "Neva",
+      "username": "Nevada",
       "firstName": "Traci",
       "lastName": "Daniels",
       "email": "tracidaniels@netility.com",
@@ -89,7 +88,8 @@
       "basicSalary": 6593421.65,
       "status": "Contract",
       "group": "Backend",
-      "description": "2022-05-23"
+      "description": "2022-05-23",
+      "id": 7
     },
     {
       "id": 8,
@@ -236,16 +236,16 @@
       "description": "2022-08-17"
     },
     {
-      "id": 20,
       "username": "Kitty",
       "firstName": "Case",
       "lastName": "Valenzuela",
       "email": "casevalenzuela@netility.com",
       "birthDate": "2005-03-21",
-      "basicSalary": 712346.97,
+      "basicSalary": 7123463.97,
       "status": "Contract",
       "group": "FrontEnd",
-      "description": "2021-01-19"
+      "description": "2021-01-19",
+      "id": 20
     },
     {
       "id": 21,
@@ -1212,12 +1212,12 @@
       "firstName": "nanda",
       "lastName": "hn",
       "email": "n@gmail.com",
-      "birthDate": "1991-12-31T17:00:00.000Z",
-      "basicSalary": 4567788,
+      "birthDate": "2022-09-02",
+      "basicSalary": 6540000,
       "status": "Permanent",
-      "group": "",
-      "description": "2022-09-12T17:00:00.000Z",
-      "id": 101
+      "group": "DB Admin",
+      "description": "2022-09-12",
+      "id": 106
     }
   ]
 }
